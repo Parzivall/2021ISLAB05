@@ -1,4 +1,9 @@
+import warnings
+import random
+warnings.filterwarnings("ignore", category=DeprecationWarning) 
+
 from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
 
 driver = webdriver.Chrome()
 driver.get("https://www.calculator.net")
@@ -10,36 +15,59 @@ driver.find_element_by_xpath("//*[@id='content']/table[2]/tbody/tr/td/div[3]/a")
 print (driver.title)
 print (driver.current_url)
 
-def unitCase(id1, id2, number1, number2, BtnXpath):
+def WatiPrintCase(number1, number2,result, case):
+	if case==1:
+		return str(number1)+"% of"+str(number2)+" = "+str(result)
+	if case==2:
+		return str(result)+" is "+str(number1)+"%"+" of "+str(number2)+"."
+	if case==3:
+		return str(number1)+" is "+str(result)+"%"+" of "+str(number2)+"."
+
+def unitCase(id1, id2, number1, number2, BtnXpath, result,case):
 	ElementCpar1=driver.find_element_by_name(id1)
 	ElementCpar2=driver.find_element_by_name(id2)
 	ElementCpar1.send_keys(number1)
 	ElementCpar2.send_keys(number2)
+
 	driver.find_element_by_xpath(BtnXpath).click() 
+	resultPage= driver.find_element_by_xpath("//*[@id='content']/p[2]")
+	print (resultPage.text)
 
-	driver.execute_script("arguments[0].setAttribute('value','')", ElementCpar2)
-	driver.execute_script("arguments[0].setAttribute('value','')", ElementCpar1)
-	resultado= driver.find_element_by_xpath("//*[@id='content']/p[2]")
+	Waitresult=WatiPrintCase(number1,number2,result,case)
+	print(Waitresult)
 
-	print (resultado.text)
+	try:
+		assert resultPage.text==Waitresult
+	except Exception as e:
+		print("ERROR, hay un problema")
+	
+	
+	driver.find_element_by_name(id1).clear()
 
-#unitCase("cpar1","cpar2",12,-200,"//*[@id='content']/table[1]/tbody/tr[2]/td/input[2]")
-
-unitCase("c21par1","c21par2",12,200,"//*[@id='content']/table[2]/tbody/tr/td[2]/input[2]")
-unitCase("c21par1","c21par2",12,300,"//*[@id='content']/table[2]/tbody/tr/td[2]/input[2]")
-unitCase("c21par1","c21par2",12,-100,"//*[@id='content']/table[2]/tbody/tr/td[2]/input[2]")
-'''unitCase("cpar1","cpar2",12,200,"//*[@id='content']/table[1]/tbody/tr[2]/td/input[2]")
-unitCase("cpar1","cpar2",12,200,"//*[@id='content']/table[1]/tbody/tr[2]/td/input[2]")
-unitCase("cpar1","cpar2",12,200,"//*[@id='content']/table[1]/tbody/tr[2]/td/input[2]")'''
+	driver.find_element_by_name(id2).clear()
+	
 
 
-#ElementCpar1=driver.find_element_by_name("cpar1")
-#ElementCpar2=driver.find_element_by_name("cpar2")
+def test_Aleatorio():
+	#########Percentage Calculator in Common Phrases
+	for i in range(10):
+		alea1=random.randrange(1, 100,4)
+		alea2=random.randrange(-1000, 1000,10)
+		resultado=alea1/100 *alea2
+		if int(resultado)== resultado:
+			resultado=int(resultado)
+		unitCase("c21par1","c21par2",alea1,alea2,"//*[@id='content']/table[2]/tbody/tr/td[2]/input[2]",resultado,2)
 
-#ElementCpar1.send_keys(10)
-#ElementCpar2.send_keys(200)
+	'''for i in range(10):
+		alea1=random.randrange(-1000, 1000,4)
+		alea2=random.randrange(-1000, 1000,10)
+		resultado=alea1/alea2*100
+		if int(resultado)== resultado:
+			resultado=int(resultado)
+		unitCase("c21par1","c21par2",alea1,alea2,"//*[@id='content']/table[2]/tbody/tr/td[2]/input[2]",resultado,3)'''
 
-#driver.find_element_by_xpath("//*[@id='content']/table[1]/tbody/tr[2]/td/input[2]").click() 
 
-#resultado= driver.find_element_by_xpath("//*[@id='content']/p[2]")
+
+test_Aleatorio()
+
 
